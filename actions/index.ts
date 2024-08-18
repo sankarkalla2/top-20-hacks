@@ -40,6 +40,7 @@ export const getTopHacks = async () => {
           _count: "desc",
         },
       },
+      
     });
 
     return hacks;
@@ -51,10 +52,13 @@ export const getTopHacks = async () => {
 export const getNewHacks = async () => {
   try {
     const newHacks = await db.post.findMany({
-      select: {
-        id: true,
-        author: true,
-        content: true,
+      include: {
+        _count: {
+          select: {
+            Likes: true,
+            disLikes: true,
+          },
+        },
         Likes: true,
         disLikes: true,
       },
@@ -111,10 +115,58 @@ export const LikePost = async (username: string, id: string) => {
       return;
     }
 
+    await db.disLikes.deleteMany({
+      where: {
+        username,
+        postId: id,
+      },
+    });
+
     const like = await db.likes.create({
       data: {
         username,
         postid: id,
+      },
+    });
+
+    if (like) return like;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const disLikePost = async (username: string, id: string) => {
+  try {
+    const isAlreadyDisLiked = await db.disLikes.findMany({
+      where: {
+        username,
+        postId: id,
+      },
+      include: {
+        Post: {
+          select: {
+            content: true,
+          },
+        },
+      },
+    });
+
+    if (isAlreadyDisLiked.length) {
+      console.log(isAlreadyDisLiked.length);
+      return;
+    }
+
+    await db.likes.deleteMany({
+      where: {
+        username,
+        postid: id,
+      },
+    });
+
+    const like = await db.disLikes.create({
+      data: {
+        username,
+        postId: id,
       },
     });
 

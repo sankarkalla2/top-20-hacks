@@ -41,6 +41,7 @@ const formSchema = z.object({
 export function AddNewHack({ button }: addNewHackProps) {
   const [user, setUser] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const router = useRouter();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,7 +64,8 @@ export function AddNewHack({ button }: addNewHackProps) {
     if (response.status == 200) {
       toast("New Hack has been created");
       router.push("/");
-      form.reset()
+      form.reset();
+      setIsOpen(false);
     } else {
       toast("Something went wrong. Please try again");
     }
@@ -75,8 +77,14 @@ export function AddNewHack({ button }: addNewHackProps) {
       setUser(localStorage.getItem("username"));
     }
   }, []);
+
   return (
-    <Dialog>
+    <Dialog
+      open={isOpen}
+      onOpenChange={() => {
+        setIsOpen((prev) => !prev);
+      }}
+    >
       <DialogTrigger asChild>{button}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

@@ -1,3 +1,4 @@
+import { ModeToggle } from "../dark-mode-toggle";
 import { AddNewHack } from "../dialog/dialog";
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
@@ -24,7 +25,9 @@ const Navbar = () => {
         />
 
         <h1 className="font-extrabold text-xl">Top 20 Hacks</h1>
+
         <div className="flex items-center gap-x-1 text-sm">
+          <ModeToggle />
           <Avatar>
             <AvatarImage src="https://github.com/shadcn.png" />
             <AvatarFallback>SA</AvatarFallback>

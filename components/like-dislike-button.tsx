@@ -4,8 +4,9 @@ import { Button } from "./ui/button";
 import { disLikes, Likes } from "@prisma/client";
 import { useEffect, useState } from "react";
 import { redirect } from "next/navigation";
-import { LikePost } from "@/actions";
+import { disLikePost, LikePost } from "@/actions";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 interface LikeAndDislikeButtonProps {
   likesCount: number;
@@ -54,15 +55,43 @@ const LikeAndDisLikeButton = ({
     }
     setLoading(false);
   };
+
+  const addDislike = async () => {
+    setLoading(true);
+    if (!username) return redirect("/username");
+
+    const response = await disLikePost(username, id);
+    if (response) {
+      setIsDisLiked(true);
+      setIsLiked(false);
+      setDislikesNo((prev) => prev + 1);
+      toast("ok");
+    }
+  };
   return (
     <div className="flex flex-col items-center text-xl font-bold">
-      <Button size={"icon"} disabled={isLiked || loading} onClick={addLike}>
-        <Plus />
-      </Button>
-      <span>{likesNo - dislikesNo}</span>
-      <Button size={"icon"} disabled={isDisked}>
-        <Minus />
-      </Button>
+      <button
+        onClick={addLike}
+        disabled={isLiked || loading}
+        className={cn(
+          "",
+          isLiked &&
+            "opacity-70 border rounded-md bg-secondary cursor-not-allowed"
+        )}
+      >
+        👌
+      </button>
+      <span className={cn("")}>{likesNo - dislikesNo}</span>
+      <button
+        onClick={addDislike}
+        className={cn(
+          "",
+          isDisked &&
+            "opacity-70 border rounded-md bg-secondary cursor-not-allowed"
+        )}
+      >
+        💩
+      </button>
     </div>
   );
 };
